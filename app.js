@@ -10,10 +10,13 @@ const blogRouter = require('./routes/blog');
 const app = express();
 
 app.use(logger('dev'));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use('/api', indexRouter); //localhost:3000/api
 app.use('/api/users', usersRouter); //localhost:3000/api/users
