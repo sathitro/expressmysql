@@ -65,7 +65,6 @@ exports.insert = async (req, res, next) => {
         
         // hash password
         const passwordHash = hashPassword(password)
-        part6 -> 30:44
 
         //INSERT
         const user = await models.User.create({
@@ -91,6 +90,81 @@ exports.insert = async (req, res, next) => {
         });
     }
 
+};
+
+// update
+exports.update = async (req, res, next) => {
+
+    try{
+        const {id, name, email, password} = req.body
+        // hash password
+        const passwordHash = hashPassword(password)
+
+        if(req.params.id != id){
+            const error = new Error('id invalid');
+            error.statusCode = 400;
+            throw error;
+        }
+
+        //UPDATE
+        const user = await models.User.update({
+            name: name,
+            email: email,
+            password: passwordHash
+        },{
+            where:{
+                id: id
+        }});
+
+        res.status(200).json({
+            message: 'Data Editted',
+            data: {
+                id: user.id,
+                name: user.name,
+                email: user.email
+            }
+        });
+
+    } catch (error){
+        res.status(error.statusCode).json({
+            error: {
+                message: error.message
+            }
+        });
+    }
+
+};
+
+//DESTROY
+exports.destroy = async (req, res, next) => {
+    try{
+        const { id } = req.params;
+
+        const user = await models.User.findByPk(id);
+        if(!user){
+            let error = new Error('There is no user in database with id '+ id);
+            error.statusCode = 404;
+            throw error;
+        }
+
+        //DELETE user by id
+        await model.User.destroy({
+            where: {
+                id: id
+            }
+        });
+
+        res.status(200).json({
+            message: user
+        });
+
+    }catch (error){
+        res.status(error.statusCode).json({
+            error: {
+                message: error.message
+            }
+        });
+    }
 };
 
 async function checkDuplicateEmail(){
