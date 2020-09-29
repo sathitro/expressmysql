@@ -13,15 +13,15 @@ exports.index = async (req, res, next) => {
     // });
 
     // const user = await models.User.findAll({
-    //     // ... email AS username
+    //     // ... email AS username ...
     //     attributes: ['id', 'name', ['email', 'username'],'create_at'],
     //     order: [['id','desc']]
     // });
 
     const sql = 'SELECT id,name,email,created_at FROM users ORDER BY id DESC';
-    const user = await models.sequelize.query(sql,{
+    const user = await models.sequelize.query(sql, {
         type: models.sequelize.QueryTypes.SELECT
-    })
+    });
 
     res.status(200).json({
         message: user
@@ -61,18 +61,11 @@ exports.insert = async (req, res, next) => {
         const {name, email, password} = req.body
 
         //Check email ซ้ำ
-        const existEmail = await models.User.findOne({where: {email: email}});
-        if(existEmail){
-            const error = new Error('Duplicater Email');
-            error.statusCode = 400;
-            throw error; 
-        }
-
+        await checkDuplicateEmail();
+        
         // hash password
-        const salt = await bscrypt.genSalt(8);
-        const passwordHash = await bscrypt.hash(password, salt);
+        const passwordHash = hashPassword(password)
         part6 -> 30:44
-
 
         //INSERT
         const user = await models.User.create({
@@ -80,8 +73,6 @@ exports.insert = async (req, res, next) => {
             email: email,
             password: passwordHash
         })
-
-        console.log(user.name);
 
         res.status(201).json({
             message: 'Data added',
@@ -102,11 +93,20 @@ exports.insert = async (req, res, next) => {
 
 };
 
+async function checkDuplicateEmail(){
+    let existEmail = await models.User.findOne({where: {email: email}});
+    if(existEmail){
+        const error = new Error('Duplicater Email');
+        error.statusCode = 400;
+        throw error; 
+    }
+}
 
-
-
-
-
+async function hashPassword(password){
+    const salt = await bscrypt.genSalt(8);
+    const passwordHash = await bscrypt.hash(password, salt);
+    return passwordHash;
+}
 
 
 
