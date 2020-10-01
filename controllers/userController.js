@@ -2,42 +2,54 @@
 const models = require('../models/index');
 const bscrypt = require('bcryptjs');
 
+//SELECT ALL
 exports.index = async (req, res, next) => {
 
-    // SELECT * FROM users
-    // const user = await models.User.findAll({
-    //     //attributes: ['id', 'name', 'email'],
-    //     attributes: { exclude: ['password'] },
-    //     where: { email: 'ikeng@gmail.om'},
-    //     order: [['id','desc']]
-    // });
+    try {
+        // SELECT * FROM users 
+        const user = await models.User.findAll({
+            //attributes: ['id', 'name', 'email'],
+            attributes: { exclude: ['password'] },
+            //where: { email: 'ikeng@gmail.om'},
+            order: [['id', 'desc']]
+        });
 
-    // const user = await models.User.findAll({
-    //     // ... email AS username ...
-    //     attributes: ['id', 'name', ['email', 'username'],'create_at'],
-    //     order: [['id','desc']]
-    // });
+        // const user = await models.User.findAll({
+        //     // ... email AS username ...
+        //     attributes: ['id', 'name', ['email', 'username'],'create_at'],
+        //     order: [['id','desc']]
+        // });
 
-    const sql = 'SELECT id,name,email,created_at FROM users ORDER BY id DESC';
-    const user = await models.sequelize.query(sql, {
-        type: models.sequelize.QueryTypes.SELECT
-    });
+        // const sql = 'SELECT id,name,email,created_at FROM users ORDER BY id DESC';
+        // const user = await models.sequelize.query(sql, {
+        //     type: models.sequelize.QueryTypes.SELECT
+        // });
 
-    res.status(200).json({
-        message: user
-    });
+        res.status(200).json({
+            message: user
+        });
+
+    } catch (error) {
+        res.status(400).json({
+            error: {
+                message: error.message
+            }
+        });
+    }
+
 
 }
 
+//SELECT BY id
 exports.showUserByID = async (req, res, next) => {
-    try{
+    try {
         const { id } = req.params;
         const user = await models.User.findByPk(id, {
             attributes: { exclude: ['password'] }
         });
 
-        if(!user){
-            let error = new Error('There is no user in database with id '+ id);
+        if (!user) {
+            let error = new Error('There is no user in database with id ' + id);
             error.statusCode = 404;
             throw error;
         }
@@ -46,7 +58,7 @@ exports.showUserByID = async (req, res, next) => {
             message: user
         });
 
-    }catch (error){
+    } catch (error) {
         res.status(error.statusCode).json({
             error: {
                 message: error.message
@@ -55,14 +67,15 @@ exports.showUserByID = async (req, res, next) => {
     }
 };
 
+//INSERT
 exports.insert = async (req, res, next) => {
 
-    try{
-        const {name, email, password} = req.body
+    try {
+        const { name, email, password } = req.body
 
         //Check email ซ้ำ
         await checkDuplicateEmail();
-        
+
         // hash password
         const passwordHash = hashPassword(password)
 
@@ -82,7 +95,7 @@ exports.insert = async (req, res, next) => {
             }
         });
 
-    } catch (error){
+    } catch (error) {
         res.status(error.statusCode).json({
             error: {
                 message: error.message
@@ -92,15 +105,15 @@ exports.insert = async (req, res, next) => {
 
 };
 
-// update
+//UPDATE
 exports.update = async (req, res, next) => {
 
-    try{
-        const {id, name, email, password} = req.body
+    try {
+        const { id, name, email, password } = req.body
         // hash password
         const passwordHash = hashPassword(password)
 
-        if(req.params.id != id){
+        if (req.params.id != id) {
             const error = new Error('id invalid');
             error.statusCode = 400;
             throw error;
@@ -111,10 +124,11 @@ exports.update = async (req, res, next) => {
             name: name,
             email: email,
             password: passwordHash
-        },{
-            where:{
+        }, {
+            where: {
                 id: id
-        }});
+            }
+        });
 
         res.status(200).json({
             message: 'Data Editted',
@@ -125,7 +139,7 @@ exports.update = async (req, res, next) => {
             }
         });
 
-    } catch (error){
+    } catch (error) {
         res.status(error.statusCode).json({
             error: {
                 message: error.message
@@ -137,12 +151,12 @@ exports.update = async (req, res, next) => {
 
 //DESTROY
 exports.destroy = async (req, res, next) => {
-    try{
+    try {
         const { id } = req.params;
 
         const user = await models.User.findByPk(id);
-        if(!user){
-            let error = new Error('There is no user in database with id '+ id);
+        if (!user) {
+            let error = new Error('There is no user in database with id ' + id);
             error.statusCode = 404;
             throw error;
         }
@@ -158,7 +172,7 @@ exports.destroy = async (req, res, next) => {
             message: user
         });
 
-    }catch (error){
+    } catch (error) {
         res.status(error.statusCode).json({
             error: {
                 message: error.message
@@ -167,16 +181,16 @@ exports.destroy = async (req, res, next) => {
     }
 };
 
-async function checkDuplicateEmail(){
-    let existEmail = await models.User.findOne({where: {email: email}});
-    if(existEmail){
+async function checkDuplicateEmail() {
+    let existEmail = await models.User.findOne({ where: { email: email } });
+    if (existEmail) {
         const error = new Error('Duplicater Email');
         error.statusCode = 400;
-        throw error; 
+        throw error;
     }
 }
 
-async function hashPassword(password){
+async function hashPassword(password) {
     const salt = await bscrypt.genSalt(8);
     const passwordHash = await bscrypt.hash(password, salt);
     return passwordHash;
