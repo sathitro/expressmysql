@@ -1,10 +1,10 @@
 'use strict';
 const { Model } = require('sequelize');
-const Blog = require('./blog');
+const User = require('./user');
 
 module.exports = (sequelize, DataTypes) => {
 
-  class User extends Model {
+  class Blog extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -22,13 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       //   autoIncrement: true,
       //   primaryKey: true
       // },
-      name: DataTypes.STRING(200),
-      password: DataTypes.STRING(100),
-      email: {
-        type: DataTypes.STRING(100),
-        unique: true,
-        allowNull: false
-      },
+      title: DataTypes.STRING(200),
       created_at : {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
@@ -36,13 +30,13 @@ module.exports = (sequelize, DataTypes) => {
     }, 
     {
       sequelize,
-      tableName: 'users',
-      modelName: 'User',
+      tableName: 'blogs',
+      modelName: 'Blogs',
       timestamps: false
     }
   );
   
-  return User;
+  return Blog;
 };
 
-User.hasMany(Blog); //Will add userId to Blog model
+Blog.belongsTo(User); //Will add userId to Blog model
