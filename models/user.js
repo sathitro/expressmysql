@@ -1,6 +1,5 @@
 'use strict';
 const { Model } = require('sequelize');
-const Blog = require('./blog');
 
 module.exports = (sequelize, DataTypes) => {
 
@@ -12,6 +11,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      models.User.hasMany(models.Blog, {as: 'blogs'});
+
+      // models.User.hasMany(models.Blog, 
+      //   {
+      //     as: 'blogs',
+      //     foreignKey: 'user_id',
+      //     sourceKey: 'id'
+      //   }
+      // );
+      
     }
   };
 
@@ -45,4 +54,4 @@ module.exports = (sequelize, DataTypes) => {
   return User;
 };
 
-User.hasMany(Blog); //Will add userId to Blog model
+//User.hasMany(Blog , {as: 'blogs'} ); //Will add userId to Blog model

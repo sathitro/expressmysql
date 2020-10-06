@@ -1,11 +1,24 @@
+const models = require('../models/index');
 
-exports.index = (req, res, next) => {
+exports.index = async (req, res, next) => {
+
+    24.05
+    const blogs = await models.User.findAll({
+        // JOIN
+        include: [{
+            model: models.User,
+            as: 'user',
+            //attributes: ['id', 'title']
+        }],
+        order: [['id', 'desc']]
+    });
+
     res.status(200).json({
-        message: 'รายการ blog'
+        message: blogs
     })
+
 }
 
-// part 5 -> 21.30
 
 
 

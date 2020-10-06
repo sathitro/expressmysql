@@ -7,12 +7,12 @@ exports.index = async (req, res, next) => {
 
     try {
         // SELECT * FROM users 
-        const user = await models.User.findAll({
-            //attributes: ['id', 'name', 'email'],
-            attributes: { exclude: ['password'] },
-            //where: { email: 'ikeng@gmail.om'},
-            order: [['id', 'desc']]
-        });
+        // const user = await models.User.findAll({
+        //     //attributes: ['id', 'name', 'email'],
+        //     attributes: { exclude: ['password'] },
+        //     //where: { email: 'ikeng@gmail.om'},
+        //     order: [['id', 'desc']]
+        // });
 
         // const user = await models.User.findAll({
         //     // ... email AS username ...
@@ -24,6 +24,24 @@ exports.index = async (req, res, next) => {
         // const user = await models.sequelize.query(sql, {
         //     type: models.sequelize.QueryTypes.SELECT
         // });
+
+        16.00
+        const user = await models.User.findAll({
+            attributes: { exclude: ['password'] },
+            // JOIN
+            include: [{
+                model: models.Blog,
+                as: 'blocks',
+                //attributes: ['id', 'title']
+            }],
+            order: [['id', 'desc']]
+            
+            // order: [ 
+            //     ['id', 'desc'],
+            //     ['blogs','id','desc']
+            // ]
+
+        });
 
         res.status(200).json({
             message: user

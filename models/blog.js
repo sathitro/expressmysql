@@ -1,6 +1,5 @@
 'use strict';
 const { Model } = require('sequelize');
-const User = require('./user');
 
 module.exports = (sequelize, DataTypes) => {
 
@@ -11,7 +10,15 @@ module.exports = (sequelize, DataTypes) => {
          * The `models/index` file will call this method automatically.
          */
         static associate(models) {
-        // define association here
+            // define association here
+
+            models.Blog.belongsTo(models.User,{as:'user'});
+
+            // models.Blog.belongsTo(models.User,{
+            //     as: 'user' ,
+            //     //foreignKey: 'id',
+            //     //sourceKey: 'user_id'
+            // });
         }
     };
 
@@ -39,4 +46,4 @@ module.exports = (sequelize, DataTypes) => {
     return Blog;
 };
 
-Blog.belongsTo(User); //Will add userId to Blog model
+//Blog.belongsTo(User); //Will add userId to Blog model
