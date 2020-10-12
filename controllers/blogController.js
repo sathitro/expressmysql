@@ -16,11 +16,11 @@ exports.index = async (req, res, next) => {
 
         res.status(200).json({
             message: blogs
-        })
+        });
     }catch(error){
         res.status(400).json({
             errorMessage: error
-        })
+        });
     }
 }
 
